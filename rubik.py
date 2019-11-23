@@ -345,15 +345,15 @@ def main():
         cube = Cube()
         cube.savestate()
         cube.plotcornerhelp('initial.png')
-        initial_message = """Let's get started! Vote for a rotation by reacting. Check the 
-                             first comment to see what each rotation does. \n 
-                             \U0001F44D for front rotation \n
-                             \U0001F497 for back rotation \n
-                             \U0001F302 for down rotation \n
-                             \U0001F62E for right rotation \n
-                             \U0001F625 for left rotation \n
-                             \U0001F621 for up rotation
-                             """
+        initial_message = """Let's get started! Vote for a rotation by reacting. \
+Check the first comment to see what each rotation does. \n 
+\U0001F44D for front rotation \n
+\U0001F497 for back rotation \n
+\U0001F602 for down rotation \n
+\U0001F62E for right rotation \n
+\U0001F625 for left rotation \n
+\U0001F621 for up rotation"""
+                             
                       
         comment_message = ('You can see in the image the possible rotations.')
                              
@@ -376,16 +376,15 @@ def main():
         cube.loadstate()
         i = np.load('counter.npy')[0]
         data = np.load('data.npy',allow_pickle=True)
-        c0 = upload_comment(data[0],data[1],"""Comments are no longer taken
-                                               from this post
-                                               """)
+        c0 = upload_comment(data[0],data[1],"""Comments are no longer \
+taken from this post""")
         #Votes are now taken from reactions instead of comments
         #ids, texts = getcomments(data[0],data[1])
         #coms = filtercomments(ids,texts)
         #inps = getinputs(coms)
         #inp = findmostcommon(inps)
         reacts = get_reactions(data[0],data[1])
-        inp = get_input_from_reactions(reacts)
+        inp = get_input_from_reaction(reacts)
         rotations = ['up','down','front','back','left',
                     'right','equatorial','middle','standing']
         #cube.rotate(inp0,'reverse'*int(inp[1]))
@@ -394,18 +393,17 @@ def main():
         cube.plotcornerhelp('img'+str(i)+'.png')
         if cube.issolved():
             message = """Congratulations, the cube has been solved!
-                         Stay tuned for the next run.
-                         """
+Stay tuned for the next run."""
+                         
         else:
-            message = """A {} rotation was made. Want to play? Check the
-                         first comment to see what each rotation does. \n 
-                         \U0001F44D for front rotation \n
-                         \U0001F497 for back rotation \n
-                         \U0001F302 for down rotation \n
-                         \U0001F62E for right rotation \n
-                         \U0001F625 for left rotation \n
-                         \U0001F621 for up rotation
-                         """.format(rotations[inp])
+            message = """A {} rotation was made. Want to play? Check the \
+first comment to see what each rotation does. \n 
+\U0001F44D for front rotation \n
+\U0001F497 for back rotation \n
+\U0001F602 for down rotation \n
+\U0001F62E for right rotation \n
+\U0001F625 for left rotation \n
+\U0001F621 for up rotation""".format(rotations[inp])
                       
 
         comment_message = ("You can see in the image the possible rotations")
