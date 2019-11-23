@@ -90,25 +90,25 @@ class Cube:
         up = [[23,11],[17,5],[11,1],[5,3],[1,7],[3,15],[7,23],[15,17],[13,29],
               [21,25],[27,19],[19,52],[25,48],[29,44],[44,50],[48,46],[52,42],
               [50,13],[46,21],[42,27]] 
-        down = [[22,6],[14,2],[6,0],[2,4],[0,10],[4,16],[10,22],[16,14],
-                [43,53],[47,49],[51,45],[45,28],[49,24],[53,18],[28,12],
-                [24,20],[18,26],[12,51],[20,47],[26,43]]   
+        down = [[6,22],[2,14],[0,6],[4,2],[10,0],[16,4],[22,10],[14,16],
+                [53,43],[49,47],[45,51],[28,45],[24,49],[18,53],[12,28],
+                [20,24],[26,18],[51,12],[47,20],[43,26]]   
         #towards user
         left = [[1,19],[5,33],[11,45],[45,22],[33,16],[19,10],[50,11],
                 [38,5],[26,1],[10,26],[16,38],[22,50],[18,28],[24,40],
                 [28,52],[40,48],[52,44],[48,32],[44,18],[32,24]]
-        back = [[1,13],[3,31],[7,43],[43,22],[31,14],[13,6],[52,7],[40,3],
-                [28,1],[6,28],[14,40],[22,52],[12,26],[20,38],[26,50],
-                [38,46],[50,42],[46,30],[42,12],[30,20]]
+        back = [[13,1],[31,3],[43,7],[22,43],[14,31],[6,13],[7,52],[3,40],
+                [1,28],[28,6],[40,14],[52,22],[26,12],[38,20],[50,26],
+                [46,38],[42,50],[30,46],[12,42],[20,30]]
         front = [[11,27],[17,39],[23,51],[19,29],[25,41],[29,53],[41,49],
                  [53,45],[49,33],[45,19],[33,25],[44,23],[32,17],[18,11],
                  [51,10],[39,4],[27,0],[0,18],[4,32],[10,44]]
-        right = [[7,29],[15,41],[23,53],[13,27],[21,39],[27,51],[39,47],
-                 [51,43],[47,31],[43,13],[31,21],[53,6],[41,2],[29,0],
-                 [42,23],[30,15],[12,7],[0,12],[2,30],[6,42]]
+        right = [[29,7],[41,15],[53,23],[27,13],[39,21],[51,27],[47,39],
+                 [43,51],[31,47],[13,43],[21,31],[6,53],[2,41],[0,29],
+                 [23,42],[15,30],[7,12],[12,0],[30,2],[42,6]]
         #clockwise
-        equatorial = [[31,41],[35,37],[39,33],[30,39],[34,35],[38,31],[33,40],
-                      [37,36],[41,32],[32,38],[36,34],[40,30]]
+        equatorial = [[41,31],[37,35],[33,39],[39,30],[35,34],[31,38],[40,33],
+                      [36,37],[32,41],[38,32],[34,36],[30,40]]
         #as in left or right of the frontal faces, towards user
         middle = [[3,25],[9,37],[17,49],[20,3],[34,9],[46,17],[49,14],
                   [37,8],[25,4],[4,20],[8,34],[14,46]]
@@ -204,7 +204,7 @@ class Cube:
     def plotcornerhelp(self,savename=''):
         im = self.plot()
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype("arial.ttf",40)
+        font = ImageFont.truetype("Lato-Medium.ttf",40)
         draw.text((5,100),'A',font=font,fill='magenta')
         draw.text((615,490),'A',font=font,fill='magenta')
         draw.text((230,-5),'B',font=font,fill='brown')
@@ -249,7 +249,22 @@ def upload(message, access_token, img_path=None):
 def getAccessToken(filename='access_token.txt'):
     return Path(filename).read_text().strip()
 
-def getcomments(graph,post_id):
+def get_reactions(graph,post_id):
+    reactions = graph.get_connections(post_id,connection_name='reactions')
+    reactions = reactions['data']
+    reacts = []
+    for reaction in reactions:
+        reacts.append(reaction['type'])
+    return reacts
+
+def get_input_from_reaction(reacts):
+    if reacts:
+        names, numbers = np.unique(reacts,return_counts=True)
+        return np.argmax(numbers)
+    else:
+        return np.randint(0,5)
+
+def getcomments(graph,post_id):#deprecated
     comments = graph.get_connections(post_id,connection_name='comments')
     comments = comments['data']
     if comments:
@@ -262,7 +277,7 @@ def getcomments(graph,post_id):
     else:
         return [],[]
 
-def filtercomments(ids,texts):
+def filtercomments(ids,texts):#deprecated
     if ids:
         ids_so_far = []
         filtered_texts=[]
@@ -278,7 +293,7 @@ def filtercomments(ids,texts):
     else:
         return []
 
-def getinputs(comments):
+def getinputs(comments):#deprecated
     if comments:
         inputs = []
         reverses = []
@@ -300,14 +315,13 @@ def getinputs(comments):
                     inputs.append(ifn)
                     reverses.append(lastletter=='!')
         output = []
-        print(inputs,reverses)
         for i in range(len(inputs)):
             output.append([inputs[i],reverses[i]])
         return output
     else:
         return []
 
-def findmostcommon(inputs):
+def findmostcommon(inputs):#deprecated
     if inputs:
         mod_output = []
         for inp in inputs:
@@ -322,25 +336,26 @@ def main():
         cube = Cube()
         cube.savestate()
         cube.plotcornerhelp('initial.png')
-        initial_message = ("Let's get started! Want to play? Check the "+
-                           'pinned post, the description or the '+
-                           'first comment for instructions.')
+        initial_message = """Let's get started! Vote for a rotation by reacting. Check the 
+                             first comment to see what each rotation does. \n 
+                             \U0001F44D for front rotation \n
+                             \U0001F497 for back rotation \n
+                             \U0001F302 for down rotation \n
+                             \U0001F62E for right rotation \n
+                             \U0001F625 for left rotation \n
+                             \U0001F621 for up rotation
+                             """
                       
-        comment_message = ('To vote for a rotation, comment !<rotation>. '+
-                           'You can see in the image the possible '+
-                           'rotations. You can comment the full name or just '+
-                           'the initial and it is not case-sensitive. For a '+
-                           'rotation in the other way than the depicted in '+
-                           'the picture simply add a ! at the end of your '+
-                           'command. Only one command per person and the '+
-                           'most voted one is chosen. For example !up! or '+
-                           '!u! perform a reverse up-face rotation')
+        comment_message = ('You can see in the image the possible rotations.')
                              
         gr, p_id = upload(initial_message,getAccessToken(),'initial.png')
         c_id = upload_comment(gr,p_id,comment_message,'tutorial.png')['id']
         cube2 = Cube()
         cube2.plot(savename='random.png',show=False)
-        upload_reply(gr,c_id,'Cubehaps','random.png')
+        upload_reply(gr,c_id,'Cubehaps, this is a random cube','random.png')
+        if cube2.issolved():
+            upload_reply(gr,c_id,'HOLY SHIT','random.png')
+        del cube2
         np.save('counter',[0])
         np.save('data',[gr,p_id])
         if cube.issolved():
@@ -352,17 +367,20 @@ def main():
         cube.loadstate()
         i = np.load('counter.npy')[0]
         data = np.load('data.npy',allow_pickle=True)
-        c0 = upload_comment(data[0],data[1],'Comments are no longer taken '+
-                            'from this post')
-        ids, texts = getcomments(data[0],data[1])
-        coms = filtercomments(ids,texts)
-        inps = getinputs(coms)
-        print(inps)
-        inp = findmostcommon(inps)
-        print(inp)
+        c0 = upload_comment(data[0],data[1],"""Comments are no longer taken
+                                               from this post
+                                               """)
+        #Votes are now taken from reactions instead of comments
+        #ids, texts = getcomments(data[0],data[1])
+        #coms = filtercomments(ids,texts)
+        #inps = getinputs(coms)
+        #inp = findmostcommon(inps)
+        reacts = get_reactions(data[0],data[1])
+        inp = get_input_from_reactions(reacts)
         rotations = ['up','down','front','back','left',
                     'right','equatorial','middle','standing']
-        cube.rotate(inp[0],'reverse'*int(inp[1]))
+        #cube.rotate(inp0,'reverse'*int(inp[1]))
+        cube.rotate(inp)
         cube.savestate()
         cube.plotcornerhelp('img'+str(i)+'.png')
         if cube.issolved():
@@ -370,31 +388,35 @@ def main():
                          Stay tuned for the next run.
                          """
         else:
-            message = ('A ' +int(inp[1])*'reverse '+ str(rotations[inp[0]]) +
-                       ' rotation was made. '+
-                       'Want to play? Check the '+
-                       'pinned post, the description or the '+ 
-                       'first comment for instructions.')
-                         
-        comment_message = ('To vote for a rotation, comment !<rotation>. '+
-                           'You can see in the image the possible '+
-                           'rotations. You can comment the full name or just '+
-                           'the initial and it is not case-sensitive. For a '+
-                           'rotation in the other way than the depicted in '+
-                           'the picture simply add a ! at the end of your '+
-                           'command. Only one command per person and the '+
-                           'most voted one is chosen. For example !up! or '+
-                           '!u! perform a reverse up-face rotation')
+            message = """A {} rotation was made. Want to play? Check the
+                         first comment to see what each rotation does. \n 
+                         \U0001F44D for front rotation \n
+                         \U0001F497 for back rotation \n
+                         \U0001F302 for down rotation \n
+                         \U0001F62E for right rotation \n
+                         \U0001F625 for left rotation \n
+                         \U0001F621 for up rotation
+                         """.format(rotations[inp])
+                      
+
+        comment_message = ("You can see in the image the possible rotations")
         
-        gr,p_id = upload(message,getAccessToken(),'img'+str(i)+'.png')
+        gr,p_id = upload(message,getAccessToken(),'img{}.png'.format(i))
         c_id = upload_comment(gr,p_id,comment_message,'tutorial.png')['id']
         cube2 = Cube()
         cube2.plot(savename='random.png',show=False)
-        del cube2
-        upload_reply(gr,c_id,'Cubehaps','random.png')
+        upload_reply(gr,c_id,'Cubehaps,this is a random cube','random.png')
+        if cube2.issolved():
+            upload_reply(gr,c_id,'HOLY SHIT','random.png')
+        del cube2 
         if cube.issolved():
             return False
         i+=1
         np.save('data',[gr,p_id])
         np.save('counter',[i])
+        if i > 100:
+            try:
+                os.command('rm img{}.png'.format(i-100))
+            except:
+                pass
         return True
