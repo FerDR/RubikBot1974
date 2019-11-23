@@ -62,7 +62,7 @@ class Cube:
         return state
     
     def shuffle(self):
-        for i in range(50):
+        for i in range(500):
             rot = np.random.randint(0,9)
             self.rotate(rot)
         
@@ -70,6 +70,9 @@ class Cube:
         matr = np.zeros(np.shape(self.label))
         matg = np.zeros(np.shape(self.label))
         matb = np.zeros(np.shape(self.label))
+        matr+=255*self.getbackgroundmatrix()
+        matg+=255*self.getbackgroundmatrix()
+        matb+=255*self.getbackgroundmatrix()
         for i in range(54):
             matr+=self.state[i][0]*np.array(self.getsquarematrix(i))
             matg+=self.state[i][1]*np.array(self.getsquarematrix(i))
@@ -78,13 +81,13 @@ class Cube:
         b = Image.fromarray(matb).convert('L')
         g = Image.fromarray(matg).convert('L')
         im = Image.merge("RGB", (r, g, b))
+        if savename:
+            im.save(savename)
         if show:
             if inline:
                 return im
             else:
                 im.show()
-        if savename:
-            im.save(savename)
     
     def rotate(self,face,way=''):
         up = [[23,11],[17,5],[11,1],[5,3],[1,7],[3,15],[7,23],[15,17],[13,29],
@@ -143,9 +146,9 @@ class Cube:
                 
     def mapper(self):
         k = 0
-        for j in range(9):
+        for j in range(11):
             mat = np.zeros(np.shape(self.label))
-            for i in range(6):
+            for i in range(5):
                 mat+=(self.getsquarematrix(i+k)*(i+1))
             plt.imshow(mat,cmap='hsv')
             plt.pause(5)
@@ -169,10 +172,13 @@ class Cube:
         return labeled,props
     
     def getsquarematrix(self,i):
-        return self.label==self.props[i][1]
+        return self.label==self.props[i+1][1]
 
     def getsquarearea(self,i):
-        return self.props[i][0]
+        return self.props[i+1][0]
+    
+    def getbackgroundmatrix(self):
+        return self.label==self.props[0][1]
 
     def savestate(self,filename='state'):
         np.save(filename,self.state)
@@ -204,7 +210,10 @@ class Cube:
     def plotcornerhelp(self,savename=''):
         im = self.plot()
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype("Lato-Medium.ttf",40)
+        try:
+            font = ImageFont.truetype("Lato-Medium.ttf",40)
+        except:
+            font = ImageFont.truetype("arial.ttf",40)
         draw.text((5,100),'A',font=font,fill='magenta')
         draw.text((615,490),'A',font=font,fill='magenta')
         draw.text((230,-5),'B',font=font,fill='brown')
@@ -217,7 +226,7 @@ class Cube:
         draw.text((820,-5),'E',font=font,fill='olive')
         draw.text((555,475),'F',font=font,fill='gray')
         draw.text((1155,70),'F',font=font,fill='gray')
-        if im:
+        if im and savename:
             im.save(savename)
         return im
 #%%
