@@ -388,7 +388,7 @@ taken from this post""")
         rotations = ['up','down','front','back','left',
                     'right','equatorial','middle','standing']
         #cube.rotate(inp0,'reverse'*int(inp[1]))
-        cube.rotate(inp)
+        cube.rotate(rotations[inp])
         cube.savestate()
         cube.plotcornerhelp('img'+str(i)+'.png')
         if cube.issolved():
