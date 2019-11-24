@@ -10,4 +10,4 @@ import time
 check = True
 while check:
     check = rb.main()
-    time.sleep(60*60)
+    time.sleep(3*60*60)
