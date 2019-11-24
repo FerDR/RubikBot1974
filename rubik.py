@@ -267,9 +267,17 @@ def get_reactions(graph,post_id):
     return reacts
 
 def get_input_from_reaction(reacts):
+    dic = {
+        "LIKE":"front",
+        "LOVE":"back",
+        "HAHA":"down",
+        "WOW":"right",
+        "SAD":"left",
+        "ANGRY":"up"
+    }
     if reacts:
         names, numbers = np.unique(reacts,return_counts=True)
-        return np.argmax(numbers)
+        return dic[names[np.argmax(numbers)]]
     else:
         return np.randint(0,5)
 
@@ -388,7 +396,7 @@ taken from this post""")
         rotations = ['up','down','front','back','left',
                     'right','equatorial','middle','standing']
         #cube.rotate(inp0,'reverse'*int(inp[1]))
-        cube.rotate(rotations[inp])
+        cube.rotate(inp)
         cube.savestate()
         cube.plotcornerhelp('img'+str(i)+'.png')
         if cube.issolved():
