@@ -396,6 +396,8 @@ taken from this post""")
         rotations = ['up','down','front','back','left',
                     'right','equatorial','middle','standing']
         #cube.rotate(inp0,'reverse'*int(inp[1]))
+        if type(inp) == int:
+            inp = rotations[i]
         cube.rotate(inp)
         cube.savestate()
         cube.plotcornerhelp('img'+str(i)+'.png')
@@ -411,7 +413,7 @@ first comment to see what each rotation does. \n
 \U0001F602 for down rotation \n
 \U0001F62E for right rotation \n
 \U0001F625 for left rotation \n
-\U0001F621 for up rotation""".format(rotations[inp])
+\U0001F621 for up rotation""".format(inp)
                       
 
         comment_message = ("You can see in the image the possible rotations")
