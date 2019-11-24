@@ -384,7 +384,7 @@ Check the first comment to see what each rotation does. \n
         cube.loadstate()
         i = np.load('counter.npy')[0]
         data = np.load('data.npy',allow_pickle=True)
-        c0 = upload_comment(data[0],data[1],"""Comments are no longer \
+        c0 = upload_comment(data[0],data[1],"""Votes are no longer \
 taken from this post""")
         #Votes are now taken from reactions instead of comments
         #ids, texts = getcomments(data[0],data[1])
