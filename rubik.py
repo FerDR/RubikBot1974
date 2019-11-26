@@ -424,7 +424,7 @@ taken from this post""")
         if cube2.issolved():
             upload_reply(gr,c_id,'HOLY SHIT','random.png')
         del cube2 
-                np.save('data',[gr,p_id])
+        np.save('data',[gr,p_id])
         i+=1
         np.save('counter',[i])
         cube.savestate()
