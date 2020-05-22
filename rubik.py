@@ -382,7 +382,7 @@ Check the first comment to see what each rotation does. \n
     else:
         cube = Cube()
         cube.loadstate()
-        i = np.load('counter.npy')[0]
+        counter = np.load('counter.npy')[0]
         data = np.load('data.npy',allow_pickle=True)
         #Votes are now taken from reactions instead of comments
         #ids, texts = getcomments(data[0],data[1])
@@ -395,12 +395,12 @@ Check the first comment to see what each rotation does. \n
                     'right','equatorial','middle','standing']
         #cube.rotate(inp0,'reverse'*int(inp[1]))
         if type(inp) == int:
-            inp = rotations[i]
+            inp = rotations[inp]
         cube.rotate(inp)
-        cube.plotcornerhelp('img'+str(i)+'.png')
+        cube.plotcornerhelp('img'+str(counter)+'.png')
         if cube.issolved():
             message = """Congratulations, the cube has been solved! It took {} rotations
-Stay tuned for the next run.""".format(i)
+Stay tuned for the next run.""".format(counter)
                          
         else:
             message = """A {} rotation was made. Want to play? Check the \
@@ -416,7 +416,7 @@ first comment to see what each rotation does. \n
         comment_message = ("You can see in the image the possible rotations")
         c0 = upload_comment(data[0],data[1],"""Votes are no longer \
 taken from this post""")
-        gr,p_id = upload(message,getAccessToken(),'img{}.png'.format(i))
+        gr,p_id = upload(message,getAccessToken(),'img{}.png'.format(counter))
         c_id = upload_comment(gr,p_id,comment_message,'tutorial.png')['id']
         cube2 = Cube()
         cube2.plot(savename='random.png',show=False)
@@ -425,12 +425,12 @@ taken from this post""")
             upload_reply(gr,c_id,'HOLY SHIT','random.png')
         del cube2 
         np.save('data',[gr,p_id])
-        i+=1
-        np.save('counter',[i])
+        counter+=1
+        np.save('counter',[counter])
         cube.savestate()
-        if i > 100:
+        if counter > 100:
             try:
-                os.command('rm img{}.png'.format(i-100))
+                os.command('rm img{}.png'.format(counter-100))
             except:
                 pass
         if cube.issolved():
