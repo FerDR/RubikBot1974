@@ -268,18 +268,19 @@ def get_reactions(graph,post_id):
 
 def get_input_from_reaction(reacts):
     dic = {
-        "LIKE":"front",
-        "LOVE":"back",
-        "HAHA":"down",
-        "WOW":"right",
-        "SAD":"left",
+        "LIKE" :"front",
+        "LOVE" :"back" ,
+        "HAHA" :"down" ,
+        "WOW"  :"right",
+        "SAD"  :"left" ,
         "ANGRY":"up"
     }
     if reacts:
         names, numbers = np.unique(reacts,return_counts=True)
         return dic[names[np.argmax(numbers)]]
     else:
-        return np.random.randint(0,5)
+        return "none"
+        #return np.random.randint(0,6)
 
 def getcomments(graph,post_id):#deprecated
     comments = graph.get_connections(post_id,connection_name='comments')
@@ -360,11 +361,9 @@ Check the first comment to see what each rotation does. \n
 \U0001F602 for down rotation \n
 \U0001F62E for right rotation \n
 \U0001F625 for left rotation \n
-\U0001F621 for up rotation"""
-                             
+\U0001F621 for up rotation"""            
                       
         comment_message = ('You can see in the image the possible rotations.')
-                             
         gr, p_id = upload(initial_message,getAccessToken(),'initial.png')
         c_id = upload_comment(gr,p_id,comment_message,'tutorial.png')['id']
         cube2 = Cube()
@@ -382,7 +381,7 @@ Check the first comment to see what each rotation does. \n
     else:
         cube = Cube()
         cube.loadstate()
-        i = np.load('counter.npy')[0]
+        counter = np.load('counter.npy')[0]
         data = np.load('data.npy',allow_pickle=True)
         #Votes are now taken from reactions instead of comments
         #ids, texts = getcomments(data[0],data[1])
@@ -394,13 +393,14 @@ Check the first comment to see what each rotation does. \n
         rotations = ['up','down','front','back','left',
                     'right','equatorial','middle','standing']
         #cube.rotate(inp0,'reverse'*int(inp[1]))
-        if type(inp) == int:
-            inp = rotations[i]
-        cube.rotate(inp)
-        cube.plotcornerhelp('img'+str(i)+'.png')
+        if not inp=="none":
+            if type(inp) == int:
+                inp = rotations[inp]
+            cube.rotate(inp)
+        cube.plotcornerhelp('img.png')
         if cube.issolved():
             message = """Congratulations, the cube has been solved! It took {} rotations
-Stay tuned for the next run.""".format(i)
+Stay tuned for the next run.""".format(counter)
                          
         else:
             message = """A {} rotation was made. Want to play? Check the \
@@ -416,7 +416,7 @@ first comment to see what each rotation does. \n
         comment_message = ("You can see in the image the possible rotations")
         c0 = upload_comment(data[0],data[1],"""Votes are no longer \
 taken from this post""")
-        gr,p_id = upload(message,getAccessToken(),'img{}.png'.format(i))
+        gr,p_id = upload(message,getAccessToken(),'img.png')
         c_id = upload_comment(gr,p_id,comment_message,'tutorial.png')['id']
         cube2 = Cube()
         cube2.plot(savename='random.png',show=False)
@@ -425,14 +425,14 @@ taken from this post""")
             upload_reply(gr,c_id,'HOLY SHIT','random.png')
         del cube2 
         np.save('data',[gr,p_id])
-        i+=1
-        np.save('counter',[i])
+        counter+=1
+        np.save('counter',[counter])
         cube.savestate()
-        if i > 100:
-            try:
-                os.command('rm img{}.png'.format(i-100))
-            except:
-                pass
+        #if counter > 100:
+            #try:
+                #os.command('rm img{}.png'.format(counter-100))
+            #except:
+                #pass
         if cube.issolved():
             return False
         return True
