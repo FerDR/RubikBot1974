@@ -361,7 +361,7 @@ Check the first comment to see what each rotation does. \n
 \U0001F602 for down rotation \n
 \U0001F62E for right rotation \n
 \U0001F625 for left rotation \n
-\U0001F621 for up rotation"""            
+\U0001F621 for up rotation""" 
                       
         comment_message = ('You can see in the image the possible rotations.')
         gr, p_id = upload(initial_message,getAccessToken(),'initial.png')
@@ -433,6 +433,4 @@ taken from this post""")
                 #os.command('rm img{}.png'.format(counter-100))
             #except:
                 #pass
-        if cube.issolved():
-            return False
-        return True
+        return not cube.issolved()
